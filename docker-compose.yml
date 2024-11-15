@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    image: ghcr.io/kvdomingo/douglas-crawler
+    restart: unless-stopped
+    init: true
+    command:
+      - >
+        poetry install --no-root --with dev;
+        exec poetry run fastapi dev --host 0.0.0.0 --port 8000 --reload;
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+      - venv-data:/app/.venv
+
+volumes:
+  venv-data:
