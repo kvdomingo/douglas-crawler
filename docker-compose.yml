@@ -1,4 +1,19 @@
 services:
+  ollama:
+    image: ollama/ollama:0.3.14
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - 11434:11434
+    volumes:
+      - ${HOME}/.ollama:/root/ollama
+
   api:
     build: .
     image: ghcr.io/kvdomingo/douglas-crawler
