@@ -13,6 +13,7 @@ class ProductVariant(BaseModel):
 class Product(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    url: AnyHttpUrl = Field(description="Link to the product")
     name: str = Field(description="Name of the product")
     image: AnyHttpUrl = Field(description="Link to image of the product")
     variant: list[ProductVariant] = Field(description="Variants of the product")

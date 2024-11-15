@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent
     PYTHON_ENV: Literal["development", "production"] = "production"
     OLLAMA_URL: AnyHttpUrl
+    DOUGLAS_BASE_URL: AnyHttpUrl = "https://www.douglas.de"
 
     POSTGRESQL_USERNAME: str
     POSTGRESQL_PASSWORD: str

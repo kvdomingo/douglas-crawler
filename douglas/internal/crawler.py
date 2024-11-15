@@ -3,7 +3,7 @@ import re
 from typing import Any
 
 from bs4 import BeautifulSoup
-from httpx import AsyncClient
+from httpx import AsyncClient, AsyncHTTPTransport
 from loguru import logger
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict
 
@@ -17,7 +17,8 @@ class DouglasCrawlerArgs(BaseModel):
 
 
 class DouglasCrawler:
-    client = AsyncClient()
+    transport = AsyncHTTPTransport(retries=3, http2=True)
+    client = AsyncClient(transport=transport)
     user_agent = (
         "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0"
     )
@@ -32,6 +33,7 @@ class DouglasCrawler:
 
         ratings = self.get_ratings()
         product = Product(
+            url=self.url,
             name=self.get_name(),
             image=self.get_image(),
             variant=[ProductVariant.model_validate(v) for v in self.get_variants()],
