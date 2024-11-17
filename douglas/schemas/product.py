@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import AnyHttpUrl, ConfigDict, Field
+from pydantic import AnyHttpUrl, ConfigDict
 
 from .base import BaseModel
 
@@ -8,19 +8,20 @@ from .base import BaseModel
 class ProductVariant(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    name: str = Field(description="Name of the variant")
-    price: float = Field(description="Price of the variant")
+    name: str
+    price: float
 
 
 class Product(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    url: AnyHttpUrl = Field(description="Link to the product")
-    name: str = Field(description="Name of the product")
-    image: AnyHttpUrl = Field(description="Link to image of the product")
-    variant: list[ProductVariant] = Field(description="Variants of the product")
-    labels: list[str] = Field(description="Labels of the product")
-    properties: dict[str, Any] = Field(description="Details of the product")
-    description: str = Field(description="Description of the product")
-    avg_rating: float = Field(description="Average rating of the product")
-    total_ratings: int = Field(description="Total ratings of the product")
+    url: AnyHttpUrl
+    name: str
+    description: str
+    image: AnyHttpUrl
+    variant: list[ProductVariant]
+    features: list[str]
+    classifications: dict[str, Any]
+    avg_rating: float
+    total_ratings: int
+    ean: str

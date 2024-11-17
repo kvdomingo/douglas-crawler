@@ -41,3 +41,7 @@ tasks:
   clean:
     desc: Nuke everything
     cmd: docker compose --project-name {{.NAME}} down -v --remove-orphans {{.CLI_ARGS}}
+
+  test:
+    desc: Run tests
+    cmd: poetry run pytest -v
