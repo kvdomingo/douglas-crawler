@@ -1,6 +1,8 @@
 from typing import Any
 
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field
+from pydantic import AnyHttpUrl, ConfigDict, Field
+
+from .base import BaseModel
 
 
 class ProductVariant(BaseModel):
@@ -17,8 +19,8 @@ class Product(BaseModel):
     name: str = Field(description="Name of the product")
     image: AnyHttpUrl = Field(description="Link to image of the product")
     variant: list[ProductVariant] = Field(description="Variants of the product")
-    product_labels: list[str] = Field(description="Labels of the product")
-    product_details: dict[str, Any] = Field(description="Details of the product")
+    labels: list[str] = Field(description="Labels of the product")
+    properties: dict[str, Any] = Field(description="Details of the product")
     description: str = Field(description="Description of the product")
     avg_rating: float = Field(description="Average rating of the product")
     total_ratings: int = Field(description="Total ratings of the product")

@@ -1,6 +1,4 @@
-from pydantic import AnyHttpUrl, Field
-
-from douglas.models import BaseModel
+from pydantic import AnyHttpUrl, BaseModel, Field
 
 
 class DouglasAPIProductListParams(BaseModel):
@@ -27,8 +25,8 @@ class DouglasAPIProductListItemImage(BaseModel):
 class DouglasAPIProductPrice(BaseModel):
     currencyIso: str
     value: float
-    originalValue: float
-    discountPercentage: float
+    originalValue: float | None = Field(None)
+    discountPercentage: float | None = Field(None)
 
 
 class DouglasAPIProductListItem(BaseModel):
@@ -58,7 +56,7 @@ class DouglasProductDetailCategory(BaseModel):
 
 
 class DouglasProductDetailClassificationFeatureValue(BaseModel):
-    code: str
+    code: str | None = Field(None)
     value: str
 
 
@@ -71,7 +69,7 @@ class DouglasProductDetailClassificationFeature(BaseModel):
 class DouglasProductDetailClassification(BaseModel):
     code: str
     name: str
-    features: list[DouglasProductDetailClassificationFeature]
+    features: list[DouglasProductDetailClassificationFeature] | None = Field(None)
 
 
 class DouglasProductDetailVariantOption(BaseModel):
@@ -94,7 +92,7 @@ class DouglasProductDetailBrand(BaseModel):
     url: str
     image: DouglasAPIProductDetailBrandImage
     svgLogo: DouglasAPIProductDetailBrandImage
-    alternateSvgLogo: DouglasAPIProductDetailBrandImage
+    alternateSvgLogo: DouglasAPIProductDetailBrandImage | None = Field(None)
 
 
 class DouglasProductDetail(BaseModel):

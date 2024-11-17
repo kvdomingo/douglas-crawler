@@ -1,18 +1,15 @@
-import json
 import re
 from typing import Any
 
 from bs4 import BeautifulSoup
 from httpx import AsyncClient, AsyncHTTPTransport
 from loguru import logger
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict
+from pydantic import AnyHttpUrl
 
-from douglas.schemas.product import Product, ProductVariant
+from douglas.schemas import BaseModel, Product, ProductVariant
 
 
 class DouglasCrawlerArgs(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     url: AnyHttpUrl
 
 
@@ -32,22 +29,17 @@ class DouglasCrawler:
         await self.get_parsed_html(html)
 
         ratings = self.get_ratings()
-        product = Product(
+        return Product(
             url=self.url,
             name=self.get_name(),
             image=self.get_image(),
             variant=[ProductVariant.model_validate(v) for v in self.get_variants()],
-            product_labels=self.get_product_labels(),
-            product_details=self.get_product_details(),
+            labels=self.get_labels(),
+            properties=self.get_properties(),
             description=self.get_description(),
             avg_rating=ratings["avg_rating"],
             total_ratings=ratings["total_ratings"],
         )
-
-        logger.debug(
-            json.dumps(product.model_dump(mode="json"), indent=2, ensure_ascii=False)
-        )
-        return product
 
     async def get_raw_html(self) -> str:
         logger.info(f"Crawling {self.url}...")
@@ -93,7 +85,7 @@ class DouglasCrawler:
             )
         ]
 
-    def get_product_labels(self) -> list[str]:
+    def get_labels(self) -> list[str]:
         return [
             s.text
             for s in self.soup.find("div", attrs={"class": "product-labels"}).find_all(
@@ -101,7 +93,7 @@ class DouglasCrawler:
             )
         ]
 
-    def get_product_details(self) -> dict[str, Any]:
+    def get_properties(self) -> dict[str, Any]:
         return {
             s.find_all("span")[0].text: s.find_all("span")[1].text
             for s in self.soup.find(
