@@ -5,7 +5,7 @@ from .douglas_api import (
     DouglasAPIProductListParams,
     DouglasProductDetail,
 )
-from .product import Product, ProductVariant
+from .product import Product, ProductClassification, ProductVariant
 
 __all__ = [
     "BaseModel",
@@ -14,5 +14,6 @@ __all__ = [
     "DouglasAPIProductListParams",
     "DouglasProductDetail",
     "Product",
+    "ProductClassification",
     "ProductVariant",
 ]

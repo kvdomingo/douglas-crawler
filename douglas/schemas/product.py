@@ -1,5 +1,3 @@
-from typing import Any
-
 from pydantic import AnyHttpUrl, ConfigDict, Field
 
 from .base import BaseModel
@@ -12,6 +10,11 @@ class ProductVariant(BaseModel):
     price: float
 
 
+class ProductClassification(BaseModel):
+    key: str
+    value: str
+
+
 class Product(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -22,6 +25,6 @@ class Product(BaseModel):
     image: AnyHttpUrl
     variant: list[ProductVariant]
     features: list[str]
-    classifications: dict[str, Any]
-    avg_rating: float
-    total_ratings: int
+    classifications: list[ProductClassification]
+    average_rating: float
+    number_of_reviews: int

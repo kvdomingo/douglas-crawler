@@ -6,7 +6,7 @@ from httpx import AsyncClient, AsyncHTTPTransport
 from loguru import logger
 from pydantic import AnyHttpUrl
 
-from douglas.schemas import BaseModel, Product, ProductVariant
+from douglas.schemas import BaseModel, Product, ProductClassification, ProductVariant
 
 
 class DouglasCrawlerArgs(BaseModel):
@@ -36,10 +36,12 @@ class DouglasCrawler:
             image=self.get_image(),
             variant=[ProductVariant.model_validate(v) for v in self.get_variants()],
             features=self.get_labels(),
-            classifications=self.get_properties(),
+            classifications=[
+                ProductClassification.model_validate(p) for p in self.get_properties()
+            ],
             description=self.get_description(),
-            avg_rating=ratings["avg_rating"],
-            total_ratings=ratings["total_ratings"],
+            average_rating=ratings["avg_rating"],
+            number_of_reviews=ratings["total_ratings"],
         )
 
     async def get_raw_html(self) -> str:
@@ -94,13 +96,16 @@ class DouglasCrawler:
             )
         ]
 
-    def get_properties(self) -> dict[str, Any]:
-        return {
-            s.find_all("span")[0].text: s.find_all("span")[1].text
+    def get_properties(self) -> list[dict[str, str]]:
+        return [
+            {
+                "key": s.find_all("span")[0].text,
+                "value": s.find_all("span")[1].text,
+            }
             for s in self.soup.find(
                 "div", attrs={"data-testid": "product-detail-info__classifications"}
             ).find_all("div")
-        }
+        ]
 
     def get_description(self) -> str:
         return self.soup.find(
