@@ -7,6 +7,7 @@ from loguru import logger
 from pydantic import AnyHttpUrl
 
 from douglas.schemas import BaseModel, Product, ProductClassification, ProductVariant
+from douglas.settings import settings
 
 
 class DouglasCrawlerArgs(BaseModel):
@@ -16,9 +17,6 @@ class DouglasCrawlerArgs(BaseModel):
 class DouglasCrawler:
     transport = AsyncHTTPTransport(retries=3, http2=True)
     client = AsyncClient(transport=transport)
-    user_agent = (
-        "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0"
-    )
     soup: BeautifulSoup
 
     def __init__(self, args: DouglasCrawlerArgs):
@@ -52,7 +50,7 @@ class DouglasCrawler:
                 "Accept": "text/html",
                 "Accept-Encoding": "gzip,deflate,br,zstd",
                 "Accept-Language": "en-US,en",
-                "User-Agent": self.user_agent,
+                "User-Agent": settings.USER_AGENT,
             },
         )
         return res.content.decode("utf-8")

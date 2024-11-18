@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, VARCHAR
+from sqlalchemy import ARRAY, JSON, TEXT, VARCHAR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from ulid import ULID
 
@@ -6,6 +6,7 @@ from ulid import ULID
 class BaseModel(DeclarativeBase):
     type_annotation_map = {
         dict: JSON,
+        list[str]: ARRAY(TEXT),
     }
 
     id: Mapped[str] = mapped_column(

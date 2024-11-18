@@ -18,17 +18,13 @@ class _Product:
     async def search_in_category(
         self,
         category_id: str,
-        page: int = 1,
-        page_size: int = 50,
+        page: int = 0,
     ):
         """Search for products in a specific product category."""
 
         res = await self.client.get(
-            f"/products/search/category/{category_id}",
-            params=DouglasAPIProductListParams(
-                page=page,
-                pageSize=page_size,
-            ).model_dump(),
+            f"/jsapi/v2/products/search/category/{category_id}",
+            params=DouglasAPIProductListParams(currentPage=page).model_dump(),
         )
         res.raise_for_status()
         products = res.json().get("products", [])
@@ -36,7 +32,7 @@ class _Product:
 
     async def get(self, id: str):
         res = await self.client.get(
-            f"/products/{id}",
+            f"/api/v2/products/{id}",
             params=DouglasAPIProductDetailParams().model_dump(),
         )
         res.raise_for_status()
@@ -45,7 +41,7 @@ class _Product:
 
 class DouglasAPI:
     default_client_params = {
-        "base_url": str(settings.API_BASE_URL),
+        "base_url": str(settings.BASE_URL),
         "headers": {
             "Accept": "application/json",
             "Accept-Encoding": "gzip,deflate,br,zstd",
@@ -73,5 +69,4 @@ class DouglasAPI:
 
 class DouglasAPIArgs(BaseModel):
     category_code: str
-    page: int = Field(1, ge=1)
-    page_size: int = Field(10, ge=1)
+    page: int = Field(0, ge=0)

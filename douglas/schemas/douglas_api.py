@@ -10,8 +10,7 @@ class DouglasAPIProductListParams(BaseModel):
     isMobile: bool = Field(False)
     isOwnBrandEnabled: bool = Field(False)
     isSSR: bool = Field(False)
-    pageSize: int = Field(50)
-    page: int = Field(1)
+    currentPage: int = Field(0, ge=0)
 
 
 class DouglasAPIProductDetailParams(BaseModel):
@@ -38,7 +37,7 @@ class DouglasAPIProductListItem(BaseModel):
     price: DouglasAPIProductPrice
     images: list[DouglasAPIProductListItemImage]
     baseProduct: str
-    baseProductName: str
+    baseProductName: str | None = Field(None)
 
 
 class DouglasAPIProductDetailBrandImage(DouglasAPIProductListItemImage):
@@ -48,11 +47,6 @@ class DouglasAPIProductDetailBrandImage(DouglasAPIProductListItemImage):
 
 class DouglasAPIProductDetailImage(DouglasAPIProductDetailBrandImage):
     format: str
-
-
-class DouglasProductDetailCategory(BaseModel):
-    code: str
-    name: str
 
 
 class DouglasProductDetailClassificationFeatureValue(BaseModel):
@@ -81,19 +75,6 @@ class DouglasProductDetailVariantOption(BaseModel):
     images: list[DouglasAPIProductDetailImage]
 
 
-class DouglasProductDetailBaseOption(BaseModel):
-    variantType: str
-    selected: DouglasProductDetailVariantOption
-
-
-class DouglasProductDetailBrand(BaseModel):
-    code: str
-    name: str
-    url: str
-    image: DouglasAPIProductDetailBrandImage | None = Field(None)
-    svgLogo: DouglasAPIProductDetailBrandImage | None = Field(None)
-
-
 class DouglasProductDetail(BaseModel):
     code: str
     url: str
@@ -104,9 +85,6 @@ class DouglasProductDetail(BaseModel):
     description: str | None = Field(None)
     averageRating: float
     numberOfReviews: int
-    price: DouglasAPIProductPrice
     images: list[DouglasAPIProductDetailImage]
     classifications: list[DouglasProductDetailClassification]
     variantOptions: list[DouglasProductDetailVariantOption]
-    baseOptions: list[DouglasProductDetailBaseOption]
-    baseContentPrice: DouglasAPIProductPrice
