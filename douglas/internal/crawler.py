@@ -31,11 +31,12 @@ class DouglasCrawler:
         ratings = self.get_ratings()
         return Product(
             url=self.url,
+            ean=None,
             name=self.get_name(),
             image=self.get_image(),
             variant=[ProductVariant.model_validate(v) for v in self.get_variants()],
-            labels=self.get_labels(),
-            properties=self.get_properties(),
+            features=self.get_labels(),
+            classifications=self.get_properties(),
             description=self.get_description(),
             avg_rating=ratings["avg_rating"],
             total_ratings=ratings["total_ratings"],

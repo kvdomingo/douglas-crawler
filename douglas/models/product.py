@@ -7,7 +7,8 @@ from .base import BaseModel
 class Product(BaseModel):
     __tablename__ = "products"
 
-    code: Mapped[str] = mapped_column()
+    code: Mapped[str] = mapped_column(unique=True)
+    ean: Mapped[str] = mapped_column(unique=True)
     url: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     average_rating: Mapped[float] = mapped_column()
@@ -19,7 +20,6 @@ class Product(BaseModel):
     image: Mapped[str] = mapped_column()
     features: Mapped[list[str]] = mapped_column()
     classifications: Mapped[dict[str, str]] = mapped_column()
-    ean: Mapped[str] = mapped_column(unique=True)
     variant: Mapped[list["ProductVariant"]] = relationship(back_populates="product")
 
 

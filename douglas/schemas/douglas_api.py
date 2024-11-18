@@ -32,9 +32,9 @@ class DouglasAPIProductPrice(BaseModel):
 class DouglasAPIProductListItem(BaseModel):
     code: str
     url: str
-    description: str
+    description: str | None = Field(None)
     averageRating: float
-    numberOfReviews: int
+    numberOfReviews: int | None = Field(None)
     price: DouglasAPIProductPrice
     images: list[DouglasAPIProductListItemImage]
     baseProduct: str
@@ -42,8 +42,8 @@ class DouglasAPIProductListItem(BaseModel):
 
 
 class DouglasAPIProductDetailBrandImage(DouglasAPIProductListItemImage):
-    width: int
-    height: int
+    width: int | None = Field(None)
+    height: int | None = Field(None)
 
 
 class DouglasAPIProductDetailImage(DouglasAPIProductDetailBrandImage):
@@ -90,28 +90,23 @@ class DouglasProductDetailBrand(BaseModel):
     code: str
     name: str
     url: str
-    image: DouglasAPIProductDetailBrandImage
-    svgLogo: DouglasAPIProductDetailBrandImage
-    alternateSvgLogo: DouglasAPIProductDetailBrandImage | None = Field(None)
+    image: DouglasAPIProductDetailBrandImage | None = Field(None)
+    svgLogo: DouglasAPIProductDetailBrandImage | None = Field(None)
 
 
 class DouglasProductDetail(BaseModel):
     code: str
     url: str
-    description: str
+    ean: str
+    baseProduct: str
+    baseProductUrl: str
+    baseProductName: str
+    description: str | None = Field(None)
     averageRating: float
     numberOfReviews: int
     price: DouglasAPIProductPrice
-    baseProduct: str
     images: list[DouglasAPIProductDetailImage]
-    categories: list[DouglasProductDetailCategory]
     classifications: list[DouglasProductDetailClassification]
     variantOptions: list[DouglasProductDetailVariantOption]
     baseOptions: list[DouglasProductDetailBaseOption]
     baseContentPrice: DouglasAPIProductPrice
-    application: str
-    ingredients: str
-    baseProductUrl: str
-    baseProductName: str
-    ean: str
-    brand: DouglasProductDetailBrand

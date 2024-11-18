@@ -1,4 +1,5 @@
 from httpx import AsyncClient
+from pydantic import Field
 
 from douglas.schemas import (
     BaseModel,
@@ -43,19 +44,34 @@ class _Product:
 
 
 class DouglasAPI:
-    client = AsyncClient(
-        base_url=str(settings.API_BASE_URL),
-        headers={
+    default_client_params = {
+        "base_url": str(settings.API_BASE_URL),
+        "headers": {
             "Accept": "application/json",
             "Accept-Encoding": "gzip,deflate,br,zstd",
             "Cache-Control": "no-cache",
             "User-Agent": settings.USER_AGENT,
         },
-    )
+    }
 
-    def __init__(self):
+    def __init__(self, client: AsyncClient = None):
+        """
+        Args:
+            client: Client override if you want to manage the HTTPX client externally.
+            If not provided, each class instance will use its own client.
+        """
+        self.client = client or self.default_client_factory()
         self.product = _Product(client=self.client)
+
+    def default_client_factory(self):
+        """
+        Returns:
+              client: Default HTTPX client
+        """
+        return AsyncClient(**self.default_client_params)
 
 
 class DouglasAPIArgs(BaseModel):
-    product_code: str
+    category_code: str
+    page: int = Field(1, ge=1)
+    page_size: int = Field(10, ge=1)

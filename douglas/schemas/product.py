@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import AnyHttpUrl, ConfigDict
+from pydantic import AnyHttpUrl, ConfigDict, Field
 
 from .base import BaseModel
 
@@ -17,6 +17,7 @@ class Product(BaseModel):
 
     url: AnyHttpUrl
     name: str
+    ean: str | None = Field(None)
     description: str
     image: AnyHttpUrl
     variant: list[ProductVariant]
@@ -24,4 +25,3 @@ class Product(BaseModel):
     classifications: dict[str, Any]
     avg_rating: float
     total_ratings: int
-    ean: str
