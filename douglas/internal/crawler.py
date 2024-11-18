@@ -91,11 +91,9 @@ class DouglasCrawler:
             if (
                 s_price_original := s.find("div", {"class": "product-price__original"})
             ) is not None:
-                obj["original_price"] = (
-                    re.search(
-                        r"\d+\.\d+", s_price_original.text.replace(",", "."), flags=re.I
-                    ).group(),
-                )
+                obj["original_price"] = re.search(
+                    r"\d+\.\d+", s_price_original.text.replace(",", "."), flags=re.I
+                ).group()
 
             out.append(obj)
 

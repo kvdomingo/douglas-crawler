@@ -7,7 +7,8 @@ env:
 
 vars: { }
 
-dotenv: [ ]
+dotenv:
+  - .env
 
 tasks:
   default:
@@ -45,3 +46,19 @@ tasks:
   test:
     desc: Run tests
     cmd: poetry run pytest -v
+
+  makemigrations:
+    desc: Create a migration file
+    cmd: task exec -- api poetry run alembic revision -m {{.CLI_ARGS}}
+
+  migrate:
+    desc: Run database migrations
+    cmd: task exec -- api poetry run alembic upgrade head
+
+  unmigrate:
+    desc: Undo a database migration
+    cmd: task exec -- api poetry run alembic downgrade -1
+
+  psql:
+    desc: Connect to the database with psql
+    cmd: task exec -- db psql -U {{.POSTGRESQL_USERNAME}} -d {{.POSTGRESQL_DATABASE}}

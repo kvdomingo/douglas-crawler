@@ -24,13 +24,18 @@ class Product(BaseModel):
 
 class ProductVariant(BaseModel):
     __tablename__ = "product_variants"
+    __table_args__ = (
+        UniqueConstraint(
+            "product_id", "name", name="uq_product_variants_product_id_name"
+        ),
+    )
 
     product: Mapped["Product"] = relationship("Product", back_populates="variants")
     product_id: Mapped[str] = mapped_column(ForeignKey("products.id"))
     name: Mapped[str] = mapped_column()
     base_price: Mapped[float] = mapped_column()
-    original_price: Mapped[float] = mapped_column()
-    discounted_price: Mapped[float] = mapped_column()
+    original_price: Mapped[float] = mapped_column(nullable=True)
+    discounted_price: Mapped[float] = mapped_column(nullable=True)
     currency: Mapped[str] = mapped_column()
 
 
@@ -38,7 +43,7 @@ class ProductClassification(BaseModel):
     __tablename__ = "product_classifications"
     __table_args__ = (
         UniqueConstraint(
-            "product_id", "key", name="uq_product_classifications_product_key"
+            "product_id", "key", name="uq_product_classifications_product_id_key"
         ),
     )
 
