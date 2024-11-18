@@ -60,7 +60,14 @@ class DouglasCrawler:
         self.soup = BeautifulSoup(html, features="lxml")
 
     def get_name(self) -> str:
-        return self.soup.find("span", {"class": "header-name"}).text
+        s = self.soup.find("div", {"class": "brand-line__container"})
+        brand_name = ""
+
+        if (s_brand := s.find("a", {"class": "brand-line"})) is not None:
+            brand_name = f"{s_brand.text} "
+
+        product_name = s.find("span", {"class": "header-name"}).text
+        return f"{brand_name}{product_name}"
 
     def get_image(self) -> str:
         return self.soup.find("img", {"class": "image swiper-lazy"}).get(
@@ -100,12 +107,13 @@ class DouglasCrawler:
         return out
 
     def get_labels(self) -> list[str]:
-        return [
-            s.text
-            for s in self.soup.find("div", {"class": "product-labels"}).find_all(
-                "span", {"class": "product-label__name"}
-            )
-        ]
+        if (s_label := self.soup.find("div", {"class": "product-labels"})) is not None:
+            return [
+                s.text
+                for s in s_label.find_all("span", {"class": "product-label__name"})
+            ]
+
+        return []
 
     def get_properties(self) -> list[dict[str, str]]:
         return [
