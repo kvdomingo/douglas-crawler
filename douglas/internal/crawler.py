@@ -6,6 +6,7 @@ from httpx import AsyncClient, AsyncHTTPTransport
 from loguru import logger
 from pydantic import AnyHttpUrl
 
+from douglas.internal.douglas_api import DouglasAPI
 from douglas.schemas import BaseModel, Product, ProductClassification, ProductVariant
 from douglas.settings import settings
 
@@ -18,18 +19,20 @@ class DouglasCrawler:
     transport = AsyncHTTPTransport(retries=3, http2=True)
     client = AsyncClient(transport=transport)
     soup: BeautifulSoup
+    raw_html: str
 
     def __init__(self, args: DouglasCrawlerArgs):
-        self.url = str(args.url)
+        self.url = args.url
 
     async def __call__(self, *args, **kwargs):
-        html = await self.get_raw_html()
-        await self.get_parsed_html(html)
+        await self.fetch_raw_html()
+        await self.parse_html(self.raw_html)
 
         ratings = self.get_ratings()
         return Product(
-            url=self.url,
-            ean=None,
+            url=str(self.url),
+            code=self.get_code(),
+            ean=await self.get_ean(),
             name=self.get_name(),
             image=self.get_image(),
             variant=[ProductVariant.model_validate(v) for v in self.get_variants()],
@@ -42,10 +45,10 @@ class DouglasCrawler:
             number_of_reviews=ratings["total_ratings"],
         )
 
-    async def get_raw_html(self) -> str:
+    async def fetch_raw_html(self):
         logger.info(f"Crawling {self.url}...")
         res = await self.client.get(
-            self.url,
+            str(self.url),
             headers={
                 "Accept": "text/html",
                 "Accept-Encoding": "gzip,deflate,br,zstd",
@@ -53,9 +56,9 @@ class DouglasCrawler:
                 "User-Agent": settings.USER_AGENT,
             },
         )
-        return res.content.decode("utf-8")
+        self.raw_html = res.content.decode("utf-8")
 
-    async def get_parsed_html(self, html: str):
+    async def parse_html(self, html: str):
         logger.info("Parsing HTML...")
         self.soup = BeautifulSoup(html, features="lxml")
 
@@ -126,6 +129,10 @@ class DouglasCrawler:
             ).find_all("div")
         ]
 
+    def get_code(self) -> str:
+        properties = self.get_properties()
+        return next(p["value"] for p in properties if p["key"].lower() == "art-nr.")
+
     def get_description(self) -> str:
         return self.soup.find(
             "div", {"class": "truncate product-details__description"}
@@ -141,3 +148,15 @@ class DouglasCrawler:
             .group()
             .strip("()"),
         }
+
+    def get_number_of_pages(self) -> str:
+        return re.search(
+            r"\d+$",
+            self.soup.find("div", {"class": "pagination-title"}),
+            flags=re.I,
+        ).group()
+
+    async def get_ean(self) -> str | None:
+        api = DouglasAPI()
+        product = await api.product.get(self.get_code())
+        return product.ean

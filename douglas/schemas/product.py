@@ -22,6 +22,7 @@ class Product(BaseModel):
 
     url: AnyHttpUrl
     name: str
+    code: str
     ean: str | None = Field(None)
     description: str
     image: AnyHttpUrl
