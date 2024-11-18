@@ -7,7 +7,9 @@ class ProductVariant(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: str
-    price: float
+    base_price: float | None = Field(None)
+    original_price: float | None = Field(None)
+    discounted_price: float | None = Field(None)
 
 
 class ProductClassification(BaseModel):

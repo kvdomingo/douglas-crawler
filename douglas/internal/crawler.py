@@ -62,37 +62,52 @@ class DouglasCrawler:
         self.soup = BeautifulSoup(html, features="lxml")
 
     def get_name(self) -> str:
-        return self.soup.find("span", attrs={"class": "header-name"}).text
+        return self.soup.find("span", {"class": "header-name"}).text
 
     def get_image(self) -> str:
-        return self.soup.find("img", attrs={"class": "image swiper-lazy"}).get(
+        return self.soup.find("img", {"class": "image swiper-lazy"}).get(
             "data-lazy-src"
         )
 
     def get_variants(self) -> list[dict[str, Any]]:
-        return [
-            {
-                "name": s.find(
-                    "div", attrs={"class": "product-detail__variant-name"}
-                ).text,
-                "price": re.search(
+        out = []
+        for s in self.soup.find_all("div", {"class": "product-detail__variant-row"}):
+            obj = {
+                "name": s.find("div", {"class": "product-detail__variant-name"}).text,
+                "base_price": re.search(
                     r"\d+\.\d+",
-                    s.find("span", attrs={"class": "product-price__price"})
+                    s.find("span", {"class": "product-price__price"})
                     .text.replace("\xa0", " ")
                     .replace(",", "."),
                     flags=re.I,
                 ).group(),
             }
-            for s in self.soup.find_all(
-                "div", attrs={"class": "product-detail__variant-row"}
-            )
-        ]
+
+            if (
+                s_price_discount := s.find("div", {"class": "product-price__discount"})
+            ) is not None:
+                obj["discounted_price"] = re.search(
+                    r"\d+\.\d+", s_price_discount.text.replace(",", "."), flags=re.I
+                ).group()
+
+            if (
+                s_price_original := s.find("div", {"class": "product-price__original"})
+            ) is not None:
+                obj["original_price"] = (
+                    re.search(
+                        r"\d+\.\d+", s_price_original.text.replace(",", "."), flags=re.I
+                    ).group(),
+                )
+
+            out.append(obj)
+
+        return out
 
     def get_labels(self) -> list[str]:
         return [
             s.text
-            for s in self.soup.find("div", attrs={"class": "product-labels"}).find_all(
-                "span", attrs={"class": "product-label__name"}
+            for s in self.soup.find("div", {"class": "product-labels"}).find_all(
+                "span", {"class": "product-label__name"}
             )
         ]
 
@@ -103,19 +118,19 @@ class DouglasCrawler:
                 "value": s.find_all("span")[1].text,
             }
             for s in self.soup.find(
-                "div", attrs={"data-testid": "product-detail-info__classifications"}
+                "div", {"data-testid": "product-detail-info__classifications"}
             ).find_all("div")
         ]
 
     def get_description(self) -> str:
         return self.soup.find(
-            "div", attrs={"class": "truncate product-details__description"}
+            "div", {"class": "truncate product-details__description"}
         ).text
 
     def get_ratings(self) -> dict[str, Any]:
-        rating_block = self.soup.find(
-            "span", attrs={"class": "ratings-info"}
-        ).text.replace("\xa0", " ")
+        rating_block = self.soup.find("span", {"class": "ratings-info"}).text.replace(
+            "\xa0", " "
+        )
         return {
             "avg_rating": re.search(r"^\d+\.\d+", rating_block, flags=re.I).group(),
             "total_ratings": re.search(r"\(\d+\)$", rating_block, flags=re.I)
