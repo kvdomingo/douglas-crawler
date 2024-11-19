@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 from argparse import ArgumentParser
 
 from httpx import AsyncClient
@@ -26,8 +27,10 @@ async def main(args: DouglasAPIArgs):
         )
         out = [d.model_dump(mode="json") for d in data]
 
+        os.makedirs(settings.BASE_DIR / "outputs/api", exist_ok=True)
+
         with open(
-            settings.BASE_DIR / "outputs" / f"products-{args.page:02}.json", "w+"
+            settings.BASE_DIR / "outputs/api" / f"products-{args.page:02}.json", "w+"
         ) as fh:
             json.dump(out, fh, **JSON_DUMP_PARAMS)
 
@@ -39,7 +42,8 @@ async def main(args: DouglasAPIArgs):
         out = [d.model_dump(mode="json") for d in res]
 
         with open(
-            settings.BASE_DIR / "outputs" / f"product-details-{args.page:02}.json", "w+"
+            settings.BASE_DIR / "outputs/api" / f"product-details-{args.page:02}.json",
+            "w+",
         ) as fh:
             json.dump(out, fh, **JSON_DUMP_PARAMS)
 

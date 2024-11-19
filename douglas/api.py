@@ -18,15 +18,15 @@ async def health_check():
 
 @app.post("/api/crawl", response_model=Product)
 async def crawl_url(body: DouglasCrawlerArgs):
-    if body.url.host != settings.DOUGLAS_BASE_URL.host:
+    if body.url.host != settings.BASE_URL.host:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail={
                 "message": "Please use the base URL of www.douglas.de when using this API",
-                "expected": settings.DOUGLAS_BASE_URL.host,
+                "expected": settings.BASE_URL.host,
                 "got": body.url.host,
             },
         )
 
-    crawl = DouglasCrawler(body)
-    return await crawl()
+    crawl = DouglasCrawler()
+    return await crawl.product.get(body.url)

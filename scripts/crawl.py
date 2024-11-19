@@ -1,13 +1,51 @@
 import asyncio
+import json
+import os
 from argparse import ArgumentParser
 
+from httpx import AsyncClient
+from pydantic import AnyHttpUrl
+from tqdm.asyncio import tqdm
+
 from douglas.internal.crawler import DouglasCrawler, DouglasCrawlerArgs
+from douglas.settings import settings
+
+NUM_THREADS = 4
 
 
 async def main(args: DouglasCrawlerArgs):
-    crawl = DouglasCrawler(args)
-    data = await crawl()
-    print(data.model_dump_json(indent=2))
+    async with AsyncClient() as client:
+        crawl = DouglasCrawler(client)
+        data = await crawl.product.search(args.url)
+
+        os.makedirs(settings.BASE_DIR / "outputs/crawl", exist_ok=True)
+
+        with open(settings.BASE_DIR / "outputs/crawl" / "products.json", "w+") as fh:
+            json.dump(data.items, fh, indent=2, ensure_ascii=False)
+
+        out = []
+        async for p in tqdm(data.items):
+            out.append(
+                await crawl.product.get(
+                    str(
+                        AnyHttpUrl.build(
+                            scheme=settings.BASE_URL.scheme,
+                            host=settings.BASE_URL.host,
+                            path=p,
+                        )
+                    )
+                )
+            )
+
+        with open(
+            settings.BASE_DIR / "outputs/crawl" / "product-details.json", "w+"
+        ) as fh:
+            json.dump(
+                [o.model_dump(mode="json") for o in out],
+                fh,
+                indent=2,
+                ensure_ascii=False,
+            )
 
 
 if __name__ == "__main__":

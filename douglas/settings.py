@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent
     BASE_URL: AnyHttpUrl = "https://www.douglas.de/"
     PYTHON_ENV: Literal["development", "production"] = "production"
-    DOUGLAS_BASE_URL: AnyHttpUrl = "https://www.douglas.de"
     USER_AGENT: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0"
 
     POSTGRESQL_USERNAME: str

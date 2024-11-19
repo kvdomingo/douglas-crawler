@@ -86,5 +86,7 @@ class DouglasProductDetail(BaseModel):
     averageRating: float
     numberOfReviews: int
     images: list[DouglasAPIProductDetailImage]
-    classifications: list[DouglasProductDetailClassification]
+    classifications: list[DouglasProductDetailClassification] = Field(
+        default_factory=list
+    )
     variantOptions: list[DouglasProductDetailVariantOption]
