@@ -29,8 +29,8 @@ def upgrade() -> None:
             url TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
-            average_rating FLOAT NOT NULL,
-            number_of_reviews INTEGER NOT NULL,
+            average_rating FLOAT,
+            number_of_reviews INTEGER,
             image TEXT NOT NULL,
             features TEXT[] NOT NULL,
 
@@ -50,7 +50,6 @@ def upgrade() -> None:
             base_price FLOAT NOT NULL,
             original_price FLOAT,
             discounted_price FLOAT,
-            currency TEXT NOT NULL,
 
             CONSTRAINT pk_product_variants PRIMARY KEY (id),
             CONSTRAINT fk_product_variants_product_id FOREIGN KEY (product_id) REFERENCES products (id),

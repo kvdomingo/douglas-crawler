@@ -12,8 +12,8 @@ class Product(BaseModel):
     url: Mapped[str] = mapped_column()
     name: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column(nullable=True)
-    average_rating: Mapped[float] = mapped_column()
-    number_of_reviews: Mapped[int] = mapped_column()
+    average_rating: Mapped[float] = mapped_column(nullable=True)
+    number_of_reviews: Mapped[int] = mapped_column(nullable=True)
     image: Mapped[str] = mapped_column()
     features: Mapped[list[str]] = mapped_column()
     classifications: Mapped[list["ProductClassification"]] = relationship(
@@ -36,7 +36,6 @@ class ProductVariant(BaseModel):
     base_price: Mapped[float] = mapped_column()
     original_price: Mapped[float] = mapped_column(nullable=True)
     discounted_price: Mapped[float] = mapped_column(nullable=True)
-    currency: Mapped[str] = mapped_column()
 
 
 class ProductClassification(BaseModel):

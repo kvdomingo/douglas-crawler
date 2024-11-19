@@ -45,7 +45,9 @@ class _Product:
             ean=await self.get_ean(soup),
             name=self.get_name(soup),
             image=self.get_image(soup),
-            variant=[ProductVariant.model_validate(v) for v in self.get_variants(soup)],
+            variants=[
+                ProductVariant.model_validate(v) for v in self.get_variants(soup)
+            ],
             features=self.get_labels(soup),
             classifications=[
                 ProductClassification.model_validate(p)

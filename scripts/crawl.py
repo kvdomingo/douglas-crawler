@@ -1,14 +1,16 @@
 import asyncio
-import json
 import os
 from argparse import ArgumentParser
 
+import polars as pl
 from httpx import AsyncClient
 from pydantic import AnyHttpUrl
 from tqdm.asyncio import tqdm
 
+from douglas.db import aget_db_context
 from douglas.internal.crawler import DouglasCrawler, DouglasCrawlerArgs
-from douglas.schemas import Product
+from douglas.models import Product, ProductClassification, ProductVariant
+from douglas.schemas import Product as ProductSchema
 from douglas.settings import settings
 
 
@@ -19,10 +21,7 @@ async def main(args: DouglasCrawlerArgs):
 
         os.makedirs(settings.BASE_DIR / "outputs/crawl", exist_ok=True)
 
-        with open(settings.BASE_DIR / "outputs/crawl" / "products.json", "w+") as fh:
-            json.dump(data.items, fh, indent=2, ensure_ascii=False)
-
-        out: list[Product] = await tqdm.gather(
+        res: list[ProductSchema] = await tqdm.gather(
             *[
                 crawl.product.get(
                     str(
@@ -34,16 +33,27 @@ async def main(args: DouglasCrawlerArgs):
                     )
                 )
                 for p in data.items
-            ],
+            ]
         )
+        df = pl.from_dicts([r.model_dump(mode="json") for r in res]).unique(
+            ["ean"], keep="first"
+        )
+        products = [
+            Product(
+                **{
+                    **d,
+                    "classifications": [
+                        ProductClassification(**c) for c in d["classifications"]
+                    ],
+                    "variants": [ProductVariant(**v) for v in d["variants"]],
+                }
+            )
+            for d in df.to_dicts()
+        ]
 
-    with open(settings.BASE_DIR / "outputs/crawl" / "product-details.json", "w+") as fh:
-        json.dump(
-            [o.model_dump(mode="json") for o in out],
-            fh,
-            indent=2,
-            ensure_ascii=False,
-        )
+        async with aget_db_context() as db:
+            db.add_all(products)
+            await db.commit()
 
 
 if __name__ == "__main__":

@@ -16,17 +16,17 @@ class ProductClassification(BaseModel):
 
 
 class Product(BaseModel):
-    url: AnyHttpUrl
-    name: str
     code: str
     ean: str | None = Field(None)
+    url: AnyHttpUrl
+    name: str
     description: str | None = Field(None)
-    image: AnyHttpUrl
-    variant: list[ProductVariant]
-    features: list[str]
-    classifications: list[ProductClassification]
     average_rating: float | None = Field(None)
     number_of_reviews: int | None = Field(None)
+    image: AnyHttpUrl
+    features: list[str]
+    classifications: list[ProductClassification]
+    variants: list[ProductVariant]
 
 
 class Paginated[T](BaseModel):

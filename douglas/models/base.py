@@ -3,6 +3,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from ulid import ULID
 
 
+def ulid_factory() -> str:
+    return str(ULID())
+
+
 class BaseModel(DeclarativeBase):
     type_annotation_map = {
         dict: JSON,
@@ -14,5 +18,5 @@ class BaseModel(DeclarativeBase):
         primary_key=True,
         index=True,
         unique=True,
-        default=ULID,
+        default=ulid_factory,
     )
