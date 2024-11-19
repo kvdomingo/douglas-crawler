@@ -26,11 +26,13 @@
     ```shell
     mise install
     ```
-3. Launch Docker containers
+3. Copy the contents of `.env.example` into a new file `.env` in the same directory, and fill in the necessary
+   environment variables.
+4. Launch Docker containers
     ```shell
     task
     ```
-4. Run the crawler
+5. Run the crawler
     ```shell
     task crawl -- -u https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308
     ```

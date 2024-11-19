@@ -27,10 +27,3 @@ class Product(BaseModel):
     features: list[str]
     classifications: list[ProductClassification]
     variants: list[ProductVariant]
-
-
-class Paginated[T](BaseModel):
-    page: int
-    page_size: int
-    total_pages: int
-    items: list[T]

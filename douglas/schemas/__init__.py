@@ -5,6 +5,7 @@ from .douglas_api import (
     DouglasAPIProductListParams,
     DouglasProductDetail,
 )
+from .paginated import Paginated
 from .product import Product, ProductClassification, ProductVariant
 
 __all__ = [
@@ -13,6 +14,7 @@ __all__ = [
     "DouglasAPIProductListItem",
     "DouglasAPIProductListParams",
     "DouglasProductDetail",
+    "Paginated",
     "Product",
     "ProductClassification",
     "ProductVariant",

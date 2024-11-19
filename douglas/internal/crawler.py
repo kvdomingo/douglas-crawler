@@ -6,8 +6,13 @@ from httpx import AsyncClient, AsyncHTTPTransport
 from pydantic import AnyHttpUrl
 
 from douglas.internal.douglas_api import DouglasAPI
-from douglas.schemas import BaseModel, Product, ProductClassification, ProductVariant
-from douglas.schemas.product import Paginated
+from douglas.schemas import (
+    BaseModel,
+    Paginated,
+    Product,
+    ProductClassification,
+    ProductVariant,
+)
 from douglas.settings import settings
 
 
