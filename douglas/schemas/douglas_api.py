@@ -81,7 +81,7 @@ class DouglasProductDetail(BaseModel):
     ean: str
     baseProduct: str
     baseProductUrl: str
-    baseProductName: str
+    baseProductName: str | None = Field(None)
     description: str | None = Field(None)
     averageRating: float
     numberOfReviews: int

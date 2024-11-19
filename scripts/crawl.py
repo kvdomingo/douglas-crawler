@@ -8,6 +8,7 @@ from pydantic import AnyHttpUrl
 from tqdm.asyncio import tqdm
 
 from douglas.internal.crawler import DouglasCrawler, DouglasCrawlerArgs
+from douglas.schemas import Product
 from douglas.settings import settings
 
 
@@ -21,10 +22,9 @@ async def main(args: DouglasCrawlerArgs):
         with open(settings.BASE_DIR / "outputs/crawl" / "products.json", "w+") as fh:
             json.dump(data.items, fh, indent=2, ensure_ascii=False)
 
-        out = []
-        async for p in tqdm(data.items):
-            out.append(
-                await crawl.product.get(
+        out: list[Product] = await tqdm.gather(
+            *[
+                crawl.product.get(
                     str(
                         AnyHttpUrl.build(
                             scheme=settings.BASE_URL.scheme,
@@ -33,17 +33,17 @@ async def main(args: DouglasCrawlerArgs):
                         )
                     )
                 )
-            )
+                for p in data.items
+            ],
+        )
 
-        with open(
-            settings.BASE_DIR / "outputs/crawl" / "product-details.json", "w+"
-        ) as fh:
-            json.dump(
-                [o.model_dump(mode="json") for o in out],
-                fh,
-                indent=2,
-                ensure_ascii=False,
-            )
+    with open(settings.BASE_DIR / "outputs/crawl" / "product-details.json", "w+") as fh:
+        json.dump(
+            [o.model_dump(mode="json") for o in out],
+            fh,
+            indent=2,
+            ensure_ascii=False,
+        )
 
 
 if __name__ == "__main__":

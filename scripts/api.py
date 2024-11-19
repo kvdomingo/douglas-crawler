@@ -3,10 +3,11 @@ import json
 import os
 from argparse import ArgumentParser
 
-from httpx import AsyncClient
+from httpx import AsyncClient, AsyncHTTPTransport
 from tqdm.asyncio import tqdm
 
 from douglas.internal.douglas_api import DouglasAPI, DouglasAPIArgs
+from douglas.schemas import DouglasProductDetail
 from douglas.settings import settings
 
 JSON_DUMP_PARAMS = {
@@ -14,17 +15,15 @@ JSON_DUMP_PARAMS = {
     "ensure_ascii": False,
 }
 
-NUM_THREADS = 4
-
 
 async def main(args: DouglasAPIArgs):
-    async with AsyncClient(**DouglasAPI.default_client_params) as client:
+    transport = AsyncHTTPTransport(retries=3)
+
+    async with AsyncClient(
+        **DouglasAPI.default_client_params, transport=transport
+    ) as client:
         api = DouglasAPI(client=client)
-        data = await api.product.search_in_category(
-            args.category_code,
-            page=args.page,
-            page_size=args.page_size,
-        )
+        data = await api.product.search_in_category(args.category_code, page=args.page)
         out = [d.model_dump(mode="json") for d in data]
 
         os.makedirs(settings.BASE_DIR / "outputs/api", exist_ok=True)
@@ -34,18 +33,16 @@ async def main(args: DouglasAPIArgs):
         ) as fh:
             json.dump(out, fh, **JSON_DUMP_PARAMS)
 
-        res = []
-        with tqdm(total=len(data)) as pbar:
-            for d in data:
-                res.append(await api.product.get(d.code))
-                pbar.update()
+        res: list[DouglasProductDetail] = await tqdm.gather(
+            *[api.product.get(d.code) for d in data]
+        )
         out = [d.model_dump(mode="json") for d in res]
 
-        with open(
-            settings.BASE_DIR / "outputs/api" / f"product-details-{args.page:02}.json",
-            "w+",
-        ) as fh:
-            json.dump(out, fh, **JSON_DUMP_PARAMS)
+    with open(
+        settings.BASE_DIR / "outputs/api" / f"product-details-{args.page:02}.json",
+        "w+",
+    ) as fh:
+        json.dump(out, fh, **JSON_DUMP_PARAMS)
 
 
 if __name__ == "__main__":
