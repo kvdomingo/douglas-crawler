@@ -12,3 +12,25 @@
   request interception/https sniffing of the product page. TIP:
   For [this product](https://www.douglas.de/de/p/3001055831) you should get `ean=3605971937811`.
 - Store all crawled information in a postgres database. Use the free tier of [Supabase](https://supabase.com/).
+
+## Running locally
+
+### Prerequisites
+
+- [Docker](https://www.docker.com)
+
+### Setup
+
+1. Install prerequisites.
+2. Install additional prerequisites
+    ```shell
+    mise install
+    ```
+3. Launch Docker containers
+    ```shell
+    task
+    ```
+4. Run the crawler
+    ```shell
+    task crawl -- -u https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308
+    ```

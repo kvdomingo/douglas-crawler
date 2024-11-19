@@ -10,8 +10,6 @@ from tqdm.asyncio import tqdm
 from douglas.internal.crawler import DouglasCrawler, DouglasCrawlerArgs
 from douglas.settings import settings
 
-NUM_THREADS = 4
-
 
 async def main(args: DouglasCrawlerArgs):
     async with AsyncClient() as client:

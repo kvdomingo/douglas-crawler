@@ -62,3 +62,7 @@ tasks:
   psql:
     desc: Connect to the database with psql
     cmd: task exec -- db psql -U {{.POSTGRESQL_USERNAME}} -d {{.POSTGRESQL_DATABASE}}
+
+  crawl:
+    desc: Run the crawler
+    cmd: task exec -- api poetry run python -m scripts.crawl {{.CLI_ARGS}}
