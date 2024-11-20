@@ -20,7 +20,18 @@ class _Product:
         category_id: str,
         page: int = 0,
     ):
-        """Search for products in a specific product category."""
+        """
+        Search for products in a specific product category.
+
+        Args:
+            category_id: Douglas category ID, e.g. if the category page URL is
+                https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308, the category ID is
+                120308.
+            page: Page number.
+
+        Returns:
+            A list of products for the given page number.
+        """
 
         res = await self.client.get(
             f"/jsapi/v2/products/search/category/{category_id}",
@@ -31,6 +42,16 @@ class _Product:
         return [DouglasAPIProductListItem.model_validate(p) for p in products]
 
     async def get(self, id: str):
+        """
+        Get product details by ID/code.
+
+        Args:
+            id: Product ID/code, e.g. if the product page URL is https://www.douglas.de/de/p/3001055831?variant=077163,
+            the product code is 3001055831.
+
+        Returns:
+            The product details.
+        """
         res = await self.client.get(
             f"/api/v2/products/{id}",
             params=DouglasAPIProductDetailParams().model_dump(),

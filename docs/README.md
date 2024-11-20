@@ -17,6 +17,9 @@ All infrastructure is managed using Terraform, and CI/CD is orchestrated via Git
 - `.github` - Configuration files for GitHub Actions.
 - `docs` - Documentation and README files.
 - `douglas` - Python code for the crawler and web API.
+  - `internal` - Internal modules (i.e. business logic).
+  - `models` - ORM definitions.
+  - `schemas` - Pydantic data models.
 - `infra` - IaC via Terraform.
 - `migrations` - SQL and scripts for database migrations.
 - `scripts` - Python scripts for running the crawler locally.

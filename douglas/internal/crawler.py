@@ -25,6 +25,16 @@ class _Product:
         self.client = client
 
     async def search(self, url: AnyHttpUrl, page: int = 1) -> Paginated[str]:
+        """
+        Search for products under a specific product category.
+
+        Args:
+              url: Product category URL, e.g. https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308.
+              page: Page number.
+
+        Returns:
+              Paginated list of products.
+        """
         html = await self.fetch_raw_html(url)
         soup = await self.parse_html(html)
         num_pages = self.get_number_of_pages(soup)
@@ -40,6 +50,15 @@ class _Product:
         )
 
     async def get(self, url: AnyHttpUrl) -> Product:
+        """
+        Scrape product details.
+
+        Args:
+            url: Product URL, e.g. https://www.douglas.de/de/p/3001055831?variant=077163.
+
+        Returns:
+            The product details.
+        """
         html = await self.fetch_raw_html(url)
         soup = await self.parse_html(html)
 
