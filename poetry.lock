@@ -2223,6 +2223,9 @@ files = [
     {file = "polars-1.14.0.tar.gz", hash = "sha256:e34fbeca4664fba754a12d0a66b36569c4c9e5a0116108d9362067a0ca596b4d"},
 ]
 
+[package.dependencies]
+pydantic = {version = "*", optional = true, markers = "extra == \"pydantic\""}
+
 [package.extras]
 adbc = ["adbc-driver-manager[dbapi]", "adbc-driver-sqlite[dbapi]"]
 all = ["polars[async,cloudpickle,database,deltalake,excel,fsspec,graph,iceberg,numpy,pandas,plot,pyarrow,pydantic,style,timezone]"]
@@ -3931,4 +3934,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "c8e9a8b1726c04fc1bcf2d7304cdee5360c998ff630436936fb2e1531810c0ea"
+content-hash = "60e650a7b966b64bbebd4f09f541813b8f4b20067244495132da7e0308dc699a"
