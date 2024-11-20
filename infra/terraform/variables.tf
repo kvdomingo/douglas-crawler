@@ -18,3 +18,7 @@ variable "supabase_access_token" {
 variable "supabase_organization_id" {
   type = string
 }
+
+variable "github_repo_id" {
+  type = string
+}

@@ -1,0 +1,131 @@
+name: "Build, push, and deploy"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: build
+  cancel-in-progress: true
+
+env:
+  GCP_PROJECT: douglas-crawler
+  GCP_REGION: europe-west3
+  SUPABASE_REGION: eu-central-1
+
+jobs:
+  apply-terraform:
+    name: Apply Terraform infrastructure
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          create_credentials_file: true
+          workload_identity_provider: "projects/${{ inputs.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-pool-provider"
+          service_account: "github-actions-sa@${{ env.GCP_PROJECT }}.iam.gserviceaccount.com"
+          access_token_scopes: "email, openid, https://www.googleapis.com/auth/cloud-platform"
+          token_format: "access_token"
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Create Terraform variables
+        run: |
+          cat > terraform.auto.tfvars <<EOF
+          project                  = "${{ env.GCP_PROJECT }}"
+          gcp_region               = "${{ env.GCP_REGION }}"
+          supabase_region          = "${{ env.SUPABASE_REGION }}"
+          supabase_access_token    = "${{ secrets.SUPABASE_ACCESS_TOKEN }}"
+          supabase_organization_id = "${{ secrets.SUPABASE_ORG_ID }}"
+          github_repo_id           = "${{ github.repository_id }}"
+          EOF
+          cat > gcs.tfbackend <<EOF
+          bucket = "${{ secrets.TERRAFORM_GCS_BACKEND }}"
+          EOF
+
+      - name: Terraform initialize
+        run: terraform init -backend-config=gcs.tfbackend -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -out=.tfplan -input=false
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -input=false .tfplan
+
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: '${{ github.actor }}/douglas-crawler-api'
+          flavor: |
+            latest=auto
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: prod.Dockerfile
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    needs:
+      - apply-terraform
+      - build-and-push
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          create_credentials_file: true
+          workload_identity_provider: "projects/${{ inputs.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-pool-provider"
+          service_account: "github-actions-sa@${{ env.GCP_PROJECT }}.iam.gserviceaccount.com"
+          access_token_scopes: "email, openid, https://www.googleapis.com/auth/cloud-platform"
+          token_format: "access_token"
+
+      - name: Deploy API
+        run: |
+          gcloud run deploy api --image="docker.io/kvdomingo/douglas-crawler-api:latest" --region="${{ env.GCP_REGION }}"
