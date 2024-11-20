@@ -1,3 +1,4 @@
+import urllib.parse
 from pathlib import Path
 from typing import Literal
 
@@ -28,11 +29,11 @@ class Settings(BaseSettings):
     @property
     def DATABASE_PARAMS(self) -> dict[str, str | int]:
         return {
-            "host": self.POSTGRESQL_HOST,
+            "host": urllib.parse.quote(self.POSTGRESQL_HOST, safe=""),
             "port": self.POSTGRESQL_PORT,
-            "username": self.POSTGRESQL_USERNAME,
-            "password": self.POSTGRESQL_PASSWORD,
-            "path": self.POSTGRESQL_DATABASE,
+            "username": urllib.parse.quote(self.POSTGRESQL_USERNAME, safe=""),
+            "password": urllib.parse.quote(self.POSTGRESQL_PASSWORD, safe=""),
+            "path": urllib.parse.quote(self.POSTGRESQL_DATABASE, safe=""),
         }
 
     @computed_field
