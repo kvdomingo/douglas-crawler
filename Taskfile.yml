@@ -45,7 +45,7 @@ tasks:
 
   test:
     desc: Run tests
-    cmd: poetry run pytest -v
+    cmd: task exec -- api poetry run pytest -v
 
   makemigrations:
     desc: Create a migration file

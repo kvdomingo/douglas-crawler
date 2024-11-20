@@ -21,12 +21,12 @@ app = FastAPI(
 )
 
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["core"])
 async def health_check():
     return "ok"
 
 
-@app.post("/api/crawl", response_model=ProductSchema)
+@app.post("/api/crawl", response_model=ProductSchema, tags=["product"])
 async def crawl_url(body: DouglasCrawlerArgs):
     if body.url.host != settings.BASE_URL.host:
         raise HTTPException(
@@ -42,7 +42,7 @@ async def crawl_url(body: DouglasCrawlerArgs):
     return await crawl.product.get(body.url)
 
 
-@app.get("/api/products", response_model=Paginated[ProductSchema])
+@app.get("/api/products", response_model=Paginated[ProductSchema], tags=["product"])
 async def list_products(
     db: AsyncSession = Depends(aget_db),
     page: int = Query(1, ge=1),
@@ -62,3 +62,20 @@ async def list_products(
         "total_pages": ceil(count / page_size),
         "items": products.all(),
     }
+
+
+@app.get("/api/products/{ean}", response_model=ProductSchema, tags=["product"])
+async def get_product(ean: str, db: AsyncSession = Depends(aget_db)):
+    res = await db.scalar(
+        select(Product)
+        .options(selectinload(Product.classifications), selectinload(Product.variants))
+        .where(Product.ean == ean)
+    )
+
+    if res is None:
+        raise HTTPException(
+            detail=f"Product with {ean=} not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return res

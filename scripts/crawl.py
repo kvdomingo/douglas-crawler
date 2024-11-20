@@ -4,8 +4,6 @@ from douglas.internal.crawler import DouglasCrawlerArgs
 
 
 async def main(args: DouglasCrawlerArgs):
-    import os
-
     import polars as pl
     from httpx import AsyncClient, AsyncHTTPTransport
     from pydantic import AnyHttpUrl
@@ -21,8 +19,6 @@ async def main(args: DouglasCrawlerArgs):
     transport = AsyncHTTPTransport(retries=10, http2=True)
 
     async with AsyncClient(timeout=10, transport=transport) as client:
-        os.makedirs(settings.BASE_DIR / "outputs/crawl", exist_ok=True)
-
         crawl = DouglasCrawler(client)
         data = await crawl.product.search(args.url)
         errors = []
