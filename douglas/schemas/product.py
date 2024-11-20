@@ -16,8 +16,8 @@ class ProductClassification(BaseModel):
 
 
 class Product(BaseModel):
-    code: str
     ean: str | None = Field(None)
+    code: str
     url: AnyHttpUrl
     name: str
     description: str | None = Field(None)

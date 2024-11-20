@@ -34,5 +34,5 @@
     ```
 5. Run the crawler
     ```shell
-    task crawl -- -u https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308
+    task crawl
     ```

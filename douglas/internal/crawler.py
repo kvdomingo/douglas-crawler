@@ -80,6 +80,7 @@ class _Product:
             },
             params=params or {},
         )
+        res.raise_for_status()
         return res.content.decode("utf-8")
 
     @staticmethod
@@ -211,8 +212,6 @@ class _Product:
 
 
 class DouglasCrawler:
-    transport = AsyncHTTPTransport(retries=3, http2=True)
-
     def __init__(self, client: AsyncClient = None):
         """
         Args:
@@ -223,9 +222,11 @@ class DouglasCrawler:
         self.client = client or self.default_client_factory()
         self.product = _Product(self.client)
 
-    def default_client_factory(self):
+    @staticmethod
+    def default_client_factory():
         """
         Returns:
               client: Default HTTPX client
         """
-        return AsyncClient(transport=self.transport)
+        transport = AsyncHTTPTransport(retries=3, http2=True)
+        return AsyncClient(transport=transport)

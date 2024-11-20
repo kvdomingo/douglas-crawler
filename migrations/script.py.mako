@@ -6,9 +6,12 @@ Create Date: ${create_date}
 
 """
 from typing import Sequence, Union
+from pathlib import Path
 
 from alembic import op
 import sqlalchemy as sa
+
+from douglas.settings import settings
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.
@@ -17,10 +20,15 @@ down_revision: Union[str, None] = ${repr(down_revision)}
 branch_labels: Union[str, Sequence[str], None] = ${repr(branch_labels)}
 depends_on: Union[str, Sequence[str], None] = ${repr(depends_on)}
 
+migrations_dir = settings.BASE_DIR / "migrations/versions"
+file_stem = Path(__file__).stem
+
 
 def upgrade() -> None:
-    ${upgrades if upgrades else "pass"}
+    conn = op.get_bind()
+    ${upgrades if upgrades else ""}
 
 
 def downgrade() -> None:
-    ${downgrades if downgrades else "pass"}
+    conn = op.get_bind()
+    ${downgrades if downgrades else ""}

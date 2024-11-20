@@ -76,9 +76,9 @@ class DouglasProductDetailVariantOption(BaseModel):
 
 
 class DouglasProductDetail(BaseModel):
+    ean: str
     code: str
     url: str
-    ean: str
     baseProduct: str
     baseProductUrl: str
     baseProductName: str | None = Field(None)
