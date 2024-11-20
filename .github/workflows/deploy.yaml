@@ -11,7 +11,7 @@ concurrency:
 
 env:
   GCP_PROJECT: douglas-crawler
-  GCP_REGION: europe-west3
+  GCP_REGION: europe-west1
   SUPABASE_REGION: eu-central-1
 
 jobs:
