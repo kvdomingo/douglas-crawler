@@ -38,7 +38,10 @@ LABEL org.opencontainers.image.title="Douglas Crawler"
 
 WORKDIR /app
 
-COPY . .
+COPY douglas douglas
+COPY migrations migrations
+COPY scripts scripts
+COPY alembic.ini alembic.ini
 COPY --from=build /app/.venv ./.venv
 
 ENTRYPOINT [ "/bin/sh", "-eu", "-c" ]
