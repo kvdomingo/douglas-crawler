@@ -78,6 +78,12 @@ resource "google_project_iam_member" "github_actions_secret_accessor" {
   role    = "roles/secretmanager.secretAccessor"
 }
 
+resource "google_project_iam_member" "github_actions_sa" {
+  member  = "serviceAccount:${google_service_account.github_actions_sa.email}"
+  project = data.google_project.project.project_id
+  role    = "roles/editor"
+}
+
 resource "google_project_iam_member" "compute_engine_sa" {
   for_each = local.compute_engine_sa_roles
 
@@ -184,4 +190,17 @@ resource "google_cloud_run_service_iam_binding" "default" {
   service = google_cloud_run_v2_service.api.name
   role    = "roles/run.invoker"
   members = ["allUsers"]
+}
+
+resource "google_cloud_run_domain_mapping" "default" {
+  name     = "douglas-cr-api.kvd.studio"
+  location = var.gcp_region
+
+  metadata {
+    namespace = data.google_project.project.project_id
+  }
+
+  spec {
+    route_name = google_cloud_run_v2_service.api.name
+  }
 }
