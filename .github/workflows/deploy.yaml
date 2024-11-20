@@ -132,7 +132,7 @@ jobs:
 
       - name: Deploy API
         run: |
-          gcloud run deploy api --image="docker.io/kvdomingo/douglas-crawler-api:latest" --region="${{ env.GCP_REGION }}"
+          gcloud run services update douglas-crawler-api --image="docker.io/kvdomingo/douglas-crawler-api:latest" --region="${{ env.GCP_REGION }}"
 
       - name: Update Crawler
         run: |

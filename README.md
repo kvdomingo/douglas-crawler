@@ -29,6 +29,7 @@ Here you will find 3 useful endpoints:
 
 #### Prerequisites
 
+- [Mise](https://mise.jdx.dev)
 - [Docker](https://www.docker.com)
 
 #### Setup
@@ -36,6 +37,9 @@ Here you will find 3 useful endpoints:
 1. Install prerequisites.
 2. Install additional prerequisites
     ```shell
+    # This will automatically install Python, Poetry, Task, and Terraform.
+    # You may not want to use Mise if you already have these tools installed or if
+    # you use a different environment manager.
     mise install
     ```
 3. Copy the contents of `.env.example` into a new file `.env` in the same directory, and fill in the necessary
@@ -60,3 +64,5 @@ category page:
 ```shell
 task crawl -- -u https://www.douglas.de/<other-page>
 ```
+
+A local copy of the web API is available at http://localhost:8000/api/docs.
