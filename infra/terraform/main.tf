@@ -1,6 +1,8 @@
 locals {
   google_apis = toset([
+    "cloudresourcemanager.googleapis.com",
     "compute.googleapis.com",
+    "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "run.googleapis.com",
     "secretmanager.googleapis.com",
@@ -16,6 +18,9 @@ locals {
     "roles/run.invoker",
     "roles/secretmanager.secretAccessor",
     "roles/secretmanager.viewer",
+  ])
+  gha_sa_roles = toset([
+    "roles/editor",
   ])
   run_image = "docker.io/kvdomingo/douglas-crawler-api"
 }
@@ -81,9 +86,11 @@ resource "google_project_iam_member" "github_actions_secret_accessor" {
 }
 
 resource "google_project_iam_member" "github_actions_sa" {
+  for_each = local.gha_sa_roles
+
   member  = "serviceAccount:${google_service_account.github_actions_sa.email}"
   project = data.google_project.project.project_id
-  role    = "roles/editor"
+  role    = each.value
 }
 
 resource "google_project_iam_member" "compute_engine_sa" {
