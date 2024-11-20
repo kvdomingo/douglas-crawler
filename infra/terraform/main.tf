@@ -133,7 +133,7 @@ resource "google_cloud_run_v2_service" "api" {
   deletion_protection = false
 
   template {
-    max_instance_request_concurrency = 300
+    max_instance_request_concurrency = 80
     timeout                          = "60s"
 
     scaling {
