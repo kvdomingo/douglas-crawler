@@ -13,13 +13,25 @@
   For [this product](https://www.douglas.de/de/p/3001055831) you should get `ean=3605971937811`.
 - Store all crawled information in a postgres database. Use the free tier of [Supabase](https://supabase.com/).
 
-## Running locally
+## Usage
 
-### Prerequisites
+### Web API
+
+Explore the [Swagger UI](https://douglas-crawler-api-lhebzk57ca-ew.a.run.app/api/docs).
+
+Here you will find 3 useful endpoints:
+
+- `/api/crawl` - Crawl a specific product page on [douglas.de](https://www.douglas.de)
+- `/api/products`
+- `/api/products/{ean}`
+
+### CLI
+
+#### Prerequisites
 
 - [Docker](https://www.docker.com)
 
-### Setup
+#### Setup
 
 1. Install prerequisites.
 2. Install additional prerequisites
@@ -32,7 +44,19 @@
     ```shell
     task
     ```
-5. Run the crawler
-    ```shell
-    task crawl
-    ```
+
+#### Running
+
+Run the crawler
+
+```shell
+task crawl
+```
+
+The crawler script has a `-u`/`--url` parameter which defaults to
+this [category page](https://www.douglas.de/de/c/gesicht/gesichtsmasken/feuchtigkeitsmasken/120308). To use a different
+category page:
+
+```shell
+task crawl -- -u https://www.douglas.de/<other-page>
+```

@@ -125,7 +125,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           create_credentials_file: true
-          workload_identity_provider: "projects/${{ inputs.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-pool-provider"
+          workload_identity_provider: "projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-pool-provider"
           service_account: "github-actions-sa@${{ env.GCP_PROJECT }}.iam.gserviceaccount.com"
           access_token_scopes: "email, openid, https://www.googleapis.com/auth/cloud-platform"
           token_format: "access_token"
