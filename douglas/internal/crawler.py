@@ -84,7 +84,7 @@ class _Product:
 
     @staticmethod
     async def parse_html(html: str):
-        return BeautifulSoup(html, features="lxml")
+        return BeautifulSoup(html, "lxml")
 
     @staticmethod
     def get_name(soup: BeautifulSoup) -> str:
