@@ -217,6 +217,49 @@ resource "google_cloud_run_domain_mapping" "default" {
   }
 }
 
+resource "google_cloud_run_v2_job" "migrate" {
+  name                = "db-migrations"
+  location            = var.gcp_region
+  deletion_protection = false
+
+  template {
+    parallelism = 1
+    task_count  = 1
+
+    template {
+      timeout     = "120s"
+      max_retries = 3
+
+      containers {
+        image = local.run_image
+        command = ["/app/.venv/bin/alembic", "upgrade", "head"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "512Mi"
+          }
+        }
+
+        dynamic "env" {
+          for_each = google_secret_manager_secret.default
+
+          content {
+            name = env.key
+
+            value_source {
+              secret_key_ref {
+                secret  = env.value.secret_id
+                version = "latest"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 resource "google_cloud_run_v2_job" "crawl" {
   name                = "douglas-crawler"
   location            = var.gcp_region
