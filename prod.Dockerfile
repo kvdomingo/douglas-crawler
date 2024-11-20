@@ -26,6 +26,11 @@ RUN poetry export --format requirements.txt --without dev --without-hashes --out
 
 FROM base AS prod
 
+LABEL org.opencontainers.image.source="https://github.com/kvdomingo/douglas-crawler"
+LABEL org.opencontainers.image.url="https://github.com/kvdomingo/douglas-crawler"
+LABEL org.opencontainers.image.authors="Kenneth V. Domingo <hello@kvd.studio>"
+LABEL org.opencontainers.image.title="Douglas Crawler"
+
 WORKDIR /tmp
 
 COPY --from=build /tmp/requirements.txt .

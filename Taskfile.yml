@@ -86,3 +86,8 @@ tasks:
     desc: Print Terraform output
     dir: infra/terraform
     cmd: terraform output -json
+
+  deploy:
+    desc: Deploy to self-hosted Kubernetes cluster
+    dir: infra/helm
+    cmd: helmfile apply
