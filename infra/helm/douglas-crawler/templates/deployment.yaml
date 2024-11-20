@@ -59,7 +59,9 @@ spec:
             - configMapRef:
                 name: '{{ .Release.Name }}-configmap'
           command:
-            - /app/.venv/bin/alembic upgrade head
+            - /app/.venv/bin/alembic
+            - upgrade
+            - head
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
