@@ -1,6 +1,7 @@
 locals {
   google_apis = toset([
     "compute.googleapis.com",
+    "iamcredentials.googleapis.com",
     "run.googleapis.com",
     "secretmanager.googleapis.com",
   ])
@@ -213,6 +214,7 @@ resource "google_cloud_run_v2_job" "crawl" {
 
   template {
     parallelism = 1
+    task_count  = 1
 
     template {
       timeout     = "120s"
