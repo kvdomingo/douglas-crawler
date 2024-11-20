@@ -16,6 +16,7 @@ locals {
     "roles/secretmanager.secretAccessor",
     "roles/secretmanager.viewer",
   ])
+  run_image = "docker.io/kvdomingo/douglas-crawler-api"
 }
 
 data "google_project" "project" {}
@@ -130,7 +131,7 @@ resource "google_cloud_run_v2_service" "api" {
     }
 
     containers {
-      image = "docker.io/kvdomingo/douglas-crawler-api"
+      image = local.run_image
 
       dynamic "env" {
         for_each = google_secret_manager_secret.default
@@ -202,5 +203,47 @@ resource "google_cloud_run_domain_mapping" "default" {
 
   spec {
     route_name = google_cloud_run_v2_service.api.name
+  }
+}
+
+resource "google_cloud_run_v2_job" "crawl" {
+  name                = "douglas-crawler"
+  location            = var.gcp_region
+  deletion_protection = false
+
+  template {
+    parallelism = 1
+
+    template {
+      timeout     = "120s"
+      max_retries = 3
+
+      containers {
+        image = local.run_image
+        command = ["/app/.venv/bin/python", "-m", "scripts.crawl"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "512Mi"
+          }
+        }
+
+        dynamic "env" {
+          for_each = google_secret_manager_secret.default
+
+          content {
+            name = env.key
+
+            value_source {
+              secret_key_ref {
+                secret  = env.value.secret_id
+                version = "latest"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
