@@ -66,3 +66,23 @@ tasks:
   crawl:
     desc: Run the crawler
     cmd: task exec -- api poetry run python -m scripts.crawl {{.CLI_ARGS}}
+
+  tf-init:
+    desc: Initialize Terraform
+    dir: infra/terraform
+    cmd: terraform init -backend-config=gcs.tfbackend
+
+  tf-plan:
+    desc: Plan Terraform changes
+    dir: infra/terraform
+    cmd: terraform plan -out=.tfplan
+
+  tf-apply:
+    desc: Apply Terraform changes
+    dir: infra/terraform
+    cmd: terraform apply .tfplan
+
+  tf-output:
+    desc: Print Terraform output
+    dir: infra/terraform
+    cmd: terraform output -json
