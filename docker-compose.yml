@@ -24,6 +24,19 @@ services:
     volumes:
       - db-data:/bitnami/postgresql
 
+  pgadmin:
+    image: dpage/pgadmin4:8.13
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PGADMIN_LISTEN_ADDRESS: 0.0.0.0
+      PGADMIN_LISTEN_PORT: 5000
+    volumes:
+      - pgadmin-data:/pgadmin
+    ports:
+      - "5000:5000"
+
 volumes:
   venv-data:
   db-data:
+  pgadmin-data:
