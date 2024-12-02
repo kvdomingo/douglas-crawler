@@ -54,8 +54,9 @@ resource "supabase_project" "douglas_crawler" {
 resource "google_project_service" "default" {
   for_each = local.google_apis
 
-  service            = each.value
-  disable_on_destroy = true
+  service                    = each.value
+  disable_on_destroy         = true
+  disable_dependent_services = true
 }
 
 resource "google_secret_manager_secret" "default" {
